@@ -1,0 +1,63 @@
+{
+  "algorithm": "pc",
+  "discovered_graph": {
+    "edges": [
+      {
+        "source": "account_age_days",
+        "target": "is_fraud",
+        "strength": 1.0
+      },
+      {
+        "source": "is_foreign_transaction",
+        "target": "is_fraud",
+        "strength": 1.0
+      },
+      {
+        "source": "device_fingerprint_age_days",
+        "target": "is_fraud",
+        "strength": 1.0
+      },
+      {
+        "source": "merchant_risk_score",
+        "target": "is_fraud",
+        "strength": 1.0
+      },
+      {
+        "source": "transaction_amount",
+        "target": "is_fraud",
+        "strength": 1.0
+      },
+      {
+        "source": "transaction_velocity_24h",
+        "target": "is_fraud",
+        "strength": 1.0
+      },
+      {
+        "source": "customer_income",
+        "target": "transaction_amount",
+        "strength": 0.9881449839955345
+      },
+      {
+        "source": "transaction_amount",
+        "target": "customer_income",
+        "strength": 0.9881449839955345
+      }
+    ],
+    "variables": [
+      "customer_age",
+      "customer_income",
+      "account_age_days",
+      "is_foreign_transaction",
+      "device_fingerprint_age_days",
+      "merchant_risk_score",
+      "transaction_amount",
+      "transaction_velocity_24h",
+      "is_fraud"
+    ]
+  },
+  "metrics": {
+    "precision": 0.875,
+    "recall": 1.0,
+    "f1": 0.9333333333333333
+  }
+}

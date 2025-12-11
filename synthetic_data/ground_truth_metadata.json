@@ -1,0 +1,377 @@
+{
+  "generator_version": "1.0.0",
+  "generated_at": "2025-12-02T09:49:28.110444+00:00",
+  "scenario_name": "fraud_detection_v1",
+  "scenario_description": "Fraud detection scenario with hidden confounder (criminal_intent). The confounder causes both transaction_velocity_24h and is_fraud, which will inflate naive correlation between velocity and fraud.",
+  "n_samples": 50000,
+  "random_seed": 42,
+  "ground_truth": {
+    "variables": [
+      {
+        "name": "customer_age",
+        "role": "EXOGENOUS",
+        "dtype": "int",
+        "description": "Wiek klienta w latach",
+        "distribution": "normal",
+        "distribution_params": {
+          "mean": 42,
+          "std": 15,
+          "min": 18,
+          "max": 85
+        },
+        "parents": [],
+        "observable": true
+      },
+      {
+        "name": "customer_income",
+        "role": "EXOGENOUS",
+        "dtype": "float",
+        "description": "Roczny dochód klienta (PLN)",
+        "distribution": "lognormal",
+        "distribution_params": {
+          "mean": 10.5,
+          "std": 0.8
+        },
+        "parents": [],
+        "observable": true
+      },
+      {
+        "name": "account_age_days",
+        "role": "EXOGENOUS",
+        "dtype": "int",
+        "description": "Wiek konta w dniach",
+        "distribution": "exponential",
+        "distribution_params": {
+          "scale": 365
+        },
+        "parents": [],
+        "observable": true
+      },
+      {
+        "name": "is_foreign_transaction",
+        "role": "EXOGENOUS",
+        "dtype": "bool",
+        "description": "Czy transakcja zagraniczna",
+        "distribution": "bernoulli",
+        "distribution_params": {
+          "p": 0.15
+        },
+        "parents": [],
+        "observable": true
+      },
+      {
+        "name": "device_fingerprint_age_days",
+        "role": "EXOGENOUS",
+        "dtype": "int",
+        "description": "Wiek device fingerprint w dniach",
+        "distribution": "exponential",
+        "distribution_params": {
+          "scale": 90
+        },
+        "parents": [],
+        "observable": true
+      },
+      {
+        "name": "merchant_risk_score",
+        "role": "EXOGENOUS",
+        "dtype": "float",
+        "description": "Ryzyko merchanta (0-1)",
+        "distribution": "beta",
+        "distribution_params": {
+          "a": 2,
+          "b": 5
+        },
+        "parents": [],
+        "observable": true
+      },
+      {
+        "name": "transaction_amount",
+        "role": "ENDOGENOUS",
+        "dtype": "float",
+        "description": "Kwota transakcji (PLN)",
+        "distribution": null,
+        "distribution_params": {},
+        "parents": [
+          "customer_income"
+        ],
+        "observable": true
+      },
+      {
+        "name": "transaction_velocity_24h",
+        "role": "ENDOGENOUS",
+        "dtype": "int",
+        "description": "Liczba transakcji w ostatnich 24h",
+        "distribution": null,
+        "distribution_params": {},
+        "parents": [
+          "criminal_intent"
+        ],
+        "observable": true
+      },
+      {
+        "name": "is_fraud",
+        "role": "OUTCOME",
+        "dtype": "bool",
+        "description": "Czy transakcja jest fraudem (target)",
+        "distribution": null,
+        "distribution_params": {},
+        "parents": [
+          "transaction_amount",
+          "transaction_velocity_24h",
+          "merchant_risk_score",
+          "is_foreign_transaction",
+          "account_age_days",
+          "device_fingerprint_age_days",
+          "criminal_intent"
+        ],
+        "observable": true
+      }
+    ],
+    "causal_edges": [
+      {
+        "source": "customer_income",
+        "target": "transaction_amount",
+        "true_strength": 0.3,
+        "mechanism_type": "LINEAR",
+        "description": "Wyższy dochód → wyższe transakcje",
+        "mechanism_details": null
+      },
+      {
+        "source": "criminal_intent",
+        "target": "transaction_velocity_24h",
+        "true_strength": 0.7,
+        "mechanism_type": "LINEAR",
+        "description": "Intencja przestępcza → więcej transakcji (card testing)",
+        "mechanism_details": null
+      },
+      {
+        "source": "transaction_amount",
+        "target": "is_fraud",
+        "true_strength": 0.4,
+        "mechanism_type": "LINEAR",
+        "description": "Wyższa kwota → wyższe ryzyko fraudu",
+        "mechanism_details": null
+      },
+      {
+        "source": "transaction_velocity_24h",
+        "target": "is_fraud",
+        "true_strength": 0.5,
+        "mechanism_type": "LINEAR",
+        "description": "Więcej transakcji → wyższe ryzyko (card testing pattern)",
+        "mechanism_details": null
+      },
+      {
+        "source": "merchant_risk_score",
+        "target": "is_fraud",
+        "true_strength": 0.35,
+        "mechanism_type": "LINEAR",
+        "description": "Ryzykowny merchant → wyższe ryzyko fraudu",
+        "mechanism_details": null
+      },
+      {
+        "source": "is_foreign_transaction",
+        "target": "is_fraud",
+        "true_strength": 0.25,
+        "mechanism_type": "LINEAR",
+        "description": "Transakcja zagraniczna → wyższe ryzyko",
+        "mechanism_details": null
+      },
+      {
+        "source": "account_age_days",
+        "target": "is_fraud",
+        "true_strength": -0.3,
+        "mechanism_type": "LINEAR",
+        "description": "Starsze konto → NIŻSZE ryzyko (zaufanie)",
+        "mechanism_details": null
+      },
+      {
+        "source": "device_fingerprint_age_days",
+        "target": "is_fraud",
+        "true_strength": -0.2,
+        "mechanism_type": "LINEAR",
+        "description": "Starszy device → NIŻSZE ryzyko",
+        "mechanism_details": null
+      },
+      {
+        "source": "criminal_intent",
+        "target": "is_fraud",
+        "true_strength": 0.6,
+        "mechanism_type": "LINEAR",
+        "description": "CONFOUNDER: Intencja przestępcza → fraud (bezpośrednio)",
+        "mechanism_details": null
+      }
+    ],
+    "confounders": [
+      {
+        "name": "criminal_intent",
+        "role": "CONFOUNDER",
+        "dtype": "float",
+        "description": "Ukryty czynnik: intencja przestępcza (0-1)",
+        "distribution": "beta",
+        "distribution_params": {
+          "a": 1,
+          "b": 9
+        },
+        "parents": [],
+        "observable": false
+      }
+    ],
+    "expected_effects": {
+      "ATE": {
+        "transaction_amount_on_fraud": 0.4,
+        "transaction_velocity_24h_on_fraud": 0.5,
+        "merchant_risk_score_on_fraud": 0.35,
+        "is_foreign_transaction_on_fraud": 0.25,
+        "account_age_days_on_fraud": -0.3,
+        "device_fingerprint_age_days_on_fraud": -0.2
+      },
+      "CATE": {
+        "high_income_customers": {
+          "transaction_amount_on_fraud": 0.35
+        },
+        "new_accounts": {
+          "transaction_velocity_on_fraud": 0.6,
+          "account_age_on_fraud": -0.5
+        },
+        "foreign_transactions": {
+          "merchant_risk_on_fraud": 0.5
+        }
+      }
+    },
+    "spurious_correlations": [
+      {
+        "variable_a": "customer_age",
+        "variable_b": "is_fraud",
+        "expected_correlation": -0.12,
+        "reason": "Młodsi klienci częściej używają ryzykownych merchantów (indirect path)",
+        "is_causal": false
+      },
+      {
+        "variable_a": "customer_income",
+        "variable_b": "is_fraud",
+        "expected_correlation": 0.08,
+        "reason": "Wyższy dochód → wyższe transakcje → fraud (mediated, nie bezpośredni)",
+        "is_causal": false
+      },
+      {
+        "variable_a": "transaction_velocity_24h",
+        "variable_b": "merchant_risk_score",
+        "expected_correlation": 0.15,
+        "reason": "Oba mogą być skutkiem criminal_intent (wspólna przyczyna)",
+        "is_causal": false
+      }
+    ],
+    "adjacency_matrix": [
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.3,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -0.3
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.25
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -0.2
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.35
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.4
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.5
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "variable_order": [
+      "customer_age",
+      "customer_income",
+      "account_age_days",
+      "is_foreign_transaction",
+      "device_fingerprint_age_days",
+      "merchant_risk_score",
+      "transaction_amount",
+      "transaction_velocity_24h",
+      "is_fraud"
+    ]
+  }
+}

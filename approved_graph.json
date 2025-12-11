@@ -1,0 +1,88 @@
+{
+  "metadata": {
+    "exported_at": "2025-12-10T18:02:45.873642+00:00",
+    "reviewed_by": "Anonymous",
+    "n_approved": 7,
+    "n_rejected": 1
+  },
+  "approved_edges": [
+    {
+      "source": "account_age_days",
+      "target": "is_fraud",
+      "discovered_strength": 1.0,
+      "ground_truth": -0.3,
+      "status": "approved",
+      "approved_strength": -0.3,
+      "is_confounded": false,
+      "confounders": []
+    },
+    {
+      "source": "is_foreign_transaction",
+      "target": "is_fraud",
+      "discovered_strength": 1.0,
+      "ground_truth": 0.25,
+      "status": "approved",
+      "approved_strength": 0.25,
+      "is_confounded": false,
+      "confounders": []
+    },
+    {
+      "source": "device_fingerprint_age_days",
+      "target": "is_fraud",
+      "discovered_strength": 1.0,
+      "ground_truth": -0.2,
+      "status": "approved",
+      "approved_strength": -0.2,
+      "is_confounded": false,
+      "confounders": []
+    },
+    {
+      "source": "merchant_risk_score",
+      "target": "is_fraud",
+      "discovered_strength": 1.0,
+      "ground_truth": 0.35,
+      "status": "approved",
+      "approved_strength": 0.35,
+      "is_confounded": false,
+      "confounders": []
+    },
+    {
+      "source": "transaction_amount",
+      "target": "is_fraud",
+      "discovered_strength": 1.0,
+      "ground_truth": 0.4,
+      "status": "approved",
+      "approved_strength": 0.4,
+      "is_confounded": false,
+      "confounders": []
+    },
+    {
+      "source": "transaction_velocity_24h",
+      "target": "is_fraud",
+      "discovered_strength": 1.0,
+      "ground_truth": 0.5,
+      "status": "approved",
+      "approved_strength": 0.5,
+      "is_confounded": true,
+      "confounders": [
+        "criminal_intent"
+      ]
+    },
+    {
+      "source": "customer_income",
+      "target": "transaction_amount",
+      "discovered_strength": 0.9881,
+      "ground_truth": 0.3,
+      "status": "approved",
+      "approved_strength": 0.3,
+      "is_confounded": false,
+      "confounders": []
+    }
+  ],
+  "rejected_edges": [
+    {
+      "source": "transaction_amount",
+      "target": "customer_income"
+    }
+  ]
+}
